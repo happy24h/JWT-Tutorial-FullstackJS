@@ -8,12 +8,9 @@ const app = express();
 
 dotenv.config();
 
-mongoose.connect(
-  "mongodb+srv://vietanh99:niemtin99@cluster0.0zujylb.mongodb.net/?retryWrites=true&w=majority",
-  () => {
-    console.log("connect to mongo DB");
-  }
-);
+mongoose.connect(process.env.MONGODB_URL, () => {
+  console.log("connect to mongo DB");
+});
 app.use(cors());
 app.use(cookieParser()); // giup tao cookie hoac gan cookie
 app.use(express.json());
