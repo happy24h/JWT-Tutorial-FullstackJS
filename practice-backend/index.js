@@ -26,3 +26,4 @@ app.listen(8000, () => {
 
 // AUTHENTICATION => chuc nang login - signup
 // AUTHORIZATION =>
+// JSON WEB TOKEN
