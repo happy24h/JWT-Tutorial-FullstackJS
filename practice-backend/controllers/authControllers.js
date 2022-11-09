@@ -24,6 +24,31 @@ const authController = {
     }
   },
 
+  // GENERATE ACCESS TOKEN
+  generateAccessToken: (user) => {
+    return jwt.sign(
+      {
+        id: user.id,
+        admin: user.isAdmin,
+      },
+      process.env.JWT_ACCESS_KEY,
+      { expiresIn: "35s" }
+    );
+  },
+
+  // GENERATE REFRESH TOKEN
+  generateRefreshToken: (user) => {
+    return jwt.sign(
+      {
+        id: user.id,
+        admin: user.isAdmin,
+      },
+      process.env.JWT_REFRESH_KEY,
+      { expiresIn: "365d" }
+    );
+  },
+
+  // LOGIN
   loginUser: async (req, res) => {
     try {
       const user = await User.findOne({ username: req.body.username });
@@ -38,14 +63,14 @@ const authController = {
         res.status(404).json("Wrong password");
       }
       if (user && validPassword) {
-        const accessToken = jwt.sign(
-          {
-            id: user.id,
-            admin: user.isAdmin,
-          },
-          process.env.JWT_ACCESS_KEY,
-          { expiresIn: "365d" }
-        );
+        const accessToken = authController.generateAccessToken(user);
+        const refreshToken = authController.generateRefreshToken(user);
+        res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: false,
+          path: "/",
+          sameSite: "strict",
+        });
         const { password, ...others } = user._doc;
         res.status(200).json({ ...others, accessToken });
       }
@@ -53,6 +78,35 @@ const authController = {
       res.status(500).json(err);
     }
   },
+
+  requestRefreshToken: async (req, res) => {
+    // Take refresh token from user
+    const refreshToken = req.cookies.refreshToken;
+    res.status(200).json(refreshToken);
+    if (!refreshToken) {
+      return res.status(401).json("You're not authenticated");
+    }
+    jwt.verify(refreshToken, process.env.JWT_ACCESS_KEY, (err, user) => {
+      if (err) {
+        console.log(err);
+      }
+      // Create new access token, refresh token
+      const newAccessToken = authController.generateAccessToken(user);
+      const newRefreshToken = authController.generateRefreshToken(user);
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: false,
+        path: "/",
+        sameSite: "strict",
+      });
+      res.status(200).json({ accessToken: newAccessToken });
+    });
+  },
 };
+
+// STORE TOKEN
+// 1 LOCAL STORAGE:
+// 2 COOKIES:
+// 3 REDUX STORE -> ACCESS TOKEN
 
 module.exports = authController;
