@@ -34,7 +34,7 @@ const authController = {
         admin: user.isAdmin,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "3h" }
+      { expiresIn: "35s" }
     );
   },
 
@@ -107,7 +107,7 @@ const authController = {
         path: "/",
         sameSite: "strict",
       });
-      res.status(200).json({ accessToken: newAccessToken });
+      return res.status(200).json({ accessToken: newAccessToken });
     });
   },
 
