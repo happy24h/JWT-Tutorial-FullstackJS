@@ -1,27 +1,27 @@
 import axios from "axios";
 import {
+  loginFailed,
   loginStart,
   loginSuccess,
-  loginFailed,
+  logOutFailed,
+  logOutStart,
+  logOutSuccess,
+  registerFailed,
   registerStart,
   registerSuccess,
-  registerFailed,
-  logOutStart,
-  logOutFailed,
-  logOutSuccess,
 } from "./authSlice";
 import {
   deleteUserFailed,
+  deleteUsersSuccess,
   deleteUserStart,
-  deleteUserSuccess,
   getUsersFailed,
   getUsersStart,
   getUsersSuccess,
 } from "./userSlice";
+//npm install axios
 
 export const loginUser = async (user, dispatch, navigate) => {
   dispatch(loginStart());
-
   try {
     const res = await axios.post("/v1/auth/login", user);
     dispatch(loginSuccess(res.data));
@@ -60,7 +60,7 @@ export const deleteUser = async (accessToken, dispatch, id, axiosJWT) => {
     const res = await axiosJWT.delete("/v1/user/" + id, {
       headers: { token: `Bearer ${accessToken}` },
     });
-    dispatch(deleteUserSuccess(res.data));
+    dispatch(deleteUsersSuccess(res.data));
   } catch (err) {
     dispatch(deleteUserFailed(err.response.data));
   }
@@ -69,7 +69,7 @@ export const deleteUser = async (accessToken, dispatch, id, axiosJWT) => {
 export const logOut = async (dispatch, id, navigate, accessToken, axiosJWT) => {
   dispatch(logOutStart());
   try {
-    await axiosJWT.post("v1/auth/logout", id, {
+    await axiosJWT.post("/v1/auth/logout", id, {
       headers: { token: `Bearer ${accessToken}` },
     });
     dispatch(logOutSuccess());

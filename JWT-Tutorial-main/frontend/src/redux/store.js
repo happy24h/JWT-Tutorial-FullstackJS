@@ -1,4 +1,4 @@
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
 import userReducer from "./userSlice";
 import {
@@ -29,6 +29,6 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-});
+})
 
 export let persistor = persistStore(store);
