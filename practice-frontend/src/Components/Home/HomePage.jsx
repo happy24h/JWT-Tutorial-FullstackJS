@@ -25,6 +25,7 @@ const HomePage = () => {
     }
     // getAllUsers(user?.accessToken, dispatch);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleDelete = (id) => {
